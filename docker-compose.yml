@@ -3,6 +3,7 @@ version: '3.8'
 services:
   mysql_db:
     image: "mysql:8.0.27"  # we have the same version of mysql in the prod
+    platform: linux/amd64  # required to run mysql on mac M1.
     container_name: mysql56-container
     environment:
       MYSQL_ROOT_USER: root
@@ -13,6 +14,8 @@ services:
 
   psql_db:
     image: "postgres:9.5.15"
+    ports:
+      - "5432:5432"
     container_name: psql-container
     environment:
       POSTGRES_ROOT_USER: root
