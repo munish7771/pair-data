@@ -24,7 +24,7 @@ def initialize_db():
     connection = None
     try:
         load_engine = create_engine(environ["MYSQL_CS"], pool_pre_ping=True, isolation_level='AUTOCOMMIT')
-        ## Add destination table.
+        ## Add destination tables
         connection = load_engine.connect()
         connection.execute(text(load_table_ddl))
         result = connection.execute(text('select * from device_fact_hourly;'))
@@ -35,30 +35,13 @@ def initialize_db():
     finally:
         if connection is not None:
             connection.close()
-def get_max_timestamp():
-    try:
-        file = open("timestamp.txt", "r")
-        return str(file.read())
-    except Exception as e:
-        print(e)
-    finally:
-        file.close()
-
-def put_max_timestamp(timestamp):
-    try:
-        file = open("timestamp.txt", "w")
-        file.write(timestamp)
-    except exception as e:
-        print(e.message)
-    finally:
-        file.close()
     
 def extract():
     connection = None
     try:
         extract_engine = create_engine(environ["POSTGRESQL_CS"])
         connection = extract_engine.connect()
-        max_unix_timestamp = get_max_timestamp()
+        max_unix_timestamp = '0'
         result = connection.execute(text(extract_sql.render(max_unix_timestamp=max_unix_timestamp)))
         return result.mappings().all()
     except Exception as e:
@@ -95,8 +78,7 @@ def load(data):
     except OperationalError as e:
         print(e)
     pass
-# if __name__ = "__main__":
-#     extract()
+
 initialize_db()
 data = extract()
 load(data)
